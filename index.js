@@ -1,5 +1,7 @@
 //to run the app with nodemon, type 'npm run dev'
 const express = require('express')
+const morgan = require('morgan')
+
 const app = express()
 
 app.use(express.json())
@@ -26,6 +28,17 @@ let persons = [
     number: '39-23-6423122',
   },
 ]
+//morgan middleware
+morgan.token('method', function (request, response) {
+  return request.method
+})
+
+app.use(morgan('tiny'), (request, response, next) => {
+  if (request.method === 'POST') {
+    console.log(`POST request's body: ${JSON.stringify(request.body)}`)
+  }
+  next()
+})
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -34,7 +47,9 @@ app.get('/api/persons', (request, response) => {
 app.get('/info', (request, response) => {
   const now = new Date()
   response.send(
-    `<p>Phonebook has info on ${persons.length + 1} people</p><p>${now}</p>`
+    `<!DOCTYPE html>
+    <p>Phonebook has info on ${persons.length + 1} people</p>
+    <p>${now}</p>`
   )
 })
 
